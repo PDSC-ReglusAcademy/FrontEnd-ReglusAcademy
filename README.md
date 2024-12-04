@@ -2,8 +2,6 @@
 
 Esse projeto visa ser um ambiente educacional inclusivo e acessível para estudantes neurodivergentes e em situação de vulnerabilidade socioeconômica.
 
-Trabalho de conclusão de curso de [Caroline Medeiros](https://github.com/mecarolme) e [Williem Oliveira](https://github.com/williemoliveiraa).
-
 :bulb: **FUNCIONALIDADES** :wrench:
 
 - Cadastro de usuários
