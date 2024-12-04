@@ -36,6 +36,7 @@ select:focus {
   --azulClaro: #977EF2;
   --preto: #0D0D0D;
   --cinzaTxt: #3B3B3B;
+  --roxoPadrao: #8c52ff;
 }
 
 ul,

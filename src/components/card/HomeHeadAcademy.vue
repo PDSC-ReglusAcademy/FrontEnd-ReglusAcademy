@@ -17,9 +17,8 @@
                     <img :src="profIcon" alt="icon">
                 </div>
                 <div class="textDescription">
-                    <h3>SEJA ACOMPANHADO POR UM TUTOR</h3>
-                    <p>Buscamos proporcionar visibilidade ao papel fundamental do pedagogo no processo educativo.
-                        Utilizamos um sistema de salas virtuais que oferece acompanhamento pedagógico personalizado.
+                    <h3>SEJA ACOMPANHADO</h3>
+                    <p>Utilizamos um sistema de salas virtuais que oferece acompanhamento pedagógico personalizado.
                     </p>
                 </div>
             </div>
@@ -37,11 +36,10 @@
         </div>
 
         <div class="rightCard">
-            <p>Planeje seus estudos, Estude em grupo com salas virtuais, Seja direcionado por um tutor, Compartilhe suas
+            <p>Planeje seus estudos, estude em grupo com salas virtuais, seja direcionado por um tutor, compartilhe suas
                 ideias e conhecimentos com demais usuários, tudo em um único ambiente de aprendizagem. </p>
             <h2>Descubra uma educação inclusiva e gratuita conosco.</h2>
         </div>
-
 
     </div>
 </template>
@@ -62,15 +60,16 @@ export default {
 <style scoped>
 #raiz {
     display: flex;
+    padding: 0em 2em;
 }
 
 .cardDescription {
     display: flex;
     background-color: #000;
-    width: 40em;
-    height: 14em;
-    border-radius: 10px;
-    margin-top: 2em;
+    width: 36em;
+    height: 9em;
+    border-radius: 10px 2px 2px 10px;
+    margin-top: 1em;
 }
 
 .textDescription {
@@ -81,18 +80,8 @@ export default {
     margin: 0em 2em;
 }
 
-.textDescription h3 {
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-.textDescription p {
-    font-size: 0.9em;
-}
-
 .iconDescription {
-    min-width: 15em;
-    background-color: #be9dff;
+    background-color: var(--roxoPadrao);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -100,15 +89,25 @@ export default {
 }
 
 .iconDescription img {
-    width: 12em;
+    width: 8em;
+    margin: 1em;
+}
+
+.textDescription h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.textDescription p {
+    font-size: 0.9em;
 }
 
 .rightCard {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    margin: 5em;
+    justify-content: space-evenly;
+    margin-left: 3em;
+    margin-right: 1em;
 }
 
 .rightCard h2 {
@@ -117,7 +116,7 @@ export default {
 }
 
 .rightCard p {
-    font-size: 1.5em;
+    font-size: 1.3em;
     text-align: justify;
 }
 </style>

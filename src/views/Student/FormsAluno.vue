@@ -276,6 +276,14 @@
         passwordMismatch: false
       }
     },
+    mounted() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userType = localStorage.getItem('userType');
+    
+    if (!user || userType !== 'STUDENT') {
+      this.$router.push('/');
+    }
+  },
     methods: {
       handleFileUpload(event) {
         this.form.comprovante = event.target.files[0];

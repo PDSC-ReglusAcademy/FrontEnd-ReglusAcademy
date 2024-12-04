@@ -84,19 +84,20 @@ a {
     display: flex;
 }
 
+.view-account,
 .logout-button {
     border: none;
     padding: 1em 2em;
     border-radius: 5px;
-    font-size: 0.9em;
+    font-size: 1em;
     font-weight: bold;
-    background: var(--roxo);
-    color: #fff;
+    background: none;
     transition: 1s;
 }
 
+.view-account:hover,
 .logout-button:hover {
-    background: var(--azulClaro);
+    color: var(--roxoPadrao);
     transition: 1s;
 }
 </style>
