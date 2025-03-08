@@ -1,0 +1,173 @@
+<template>
+    <div class="container" v-if="userRole === 'EDUCATOR'">
+        <h3>Cadastre uma sala nova e compartilhe conhecimento!</h3>
+        <form @submit.prevent="submitRoom">
+            <div class="form-group">
+                <label for="name">Nome da Sala:</label>
+                <input type="text" id="name" v-model="form.name" class="form-control mt-2"
+                    placeholder="Turma do Prof° João" required />
+            </div>
+
+            <div class="form-group">
+                <label for="startDate">Data de Início:</label>
+                <input type="date" id="startDate" v-model="form.startDate" class="form-control mt-2" required />
+            </div>
+
+            <div class="form-group">
+                <label for="endDate">Data de Término (Opcional):</label>
+                <input type="date" id="endDate" v-model="form.endDate" class="form-control mt-2"
+                    :placeholder="form.endDate ? '' : 'Data de término opcional'" />
+            </div>
+
+            <div class="form-group">
+                <label for="courseName">Nome do Curso ou Matéria que será ensinada:</label>
+                <input type="text" id="courseName" v-model="form.courseName" class="form-control mt-2"
+                    placeholder="Nome do curso" required />
+            </div>
+
+            <div class="form-group">
+                <label for="courseDescription">Descrição do Curso ou Matéria (opcional):</label>
+                <textarea id="courseDescription" v-model="form.courseDescription" rows="4" class="form-control mt-2"
+                    placeholder="Descrição do curso"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="coursePrice">Preço:</label>
+                <p>Caso gratuito, defina como 0</p>
+                <input type="number" id="coursePrice" v-model="form.coursePrice" class="form-control mt-2"
+                    placeholder="Preço do curso" required />
+            </div>
+
+            <div class="form-group">
+                <label for="coursePeriod">Período do Curso:</label>
+                <input type="text" id="coursePeriod" v-model="form.coursePeriod" class="form-control mt-2"
+                    placeholder="Período do curso" required />
+            </div>
+
+            <div class="form-group">
+                <label for="courseSchedule">Frequência do Curso:</label>
+                <input type="text" id="courseSchedule" v-model="form.courseSchedule" class="form-control mt-2"
+                    placeholder="Frequência do curso" required />
+            </div>
+
+            <div v-if="successMessage" class="alert alert-success mt-3">
+                {{ successMessage }} <strong> O formulário irá fechar em {{ timer }} ...</strong>
+            </div>
+
+            <div v-if="errorMessage" class="alert alert-danger mt-3">
+                {{ errorMessage }}
+            </div>
+
+            <div class="btn">
+                <button type="submit" class="btn btn-primary">Cadastrar Sala Nova</button>
+            </div>
+        </form>
+    </div>
+</template>
+
+<script>
+
+export default {
+    name: "RoomRegister",
+    data() {
+        return {
+            userRole: '',
+            form: {
+                name: '',
+                description: '',
+                startDate: '',
+                endDate: '',
+                courseName: '',
+                courseDescription: '',
+                coursePrice: 0,
+                coursePeriod: '',
+                courseSchedule: ''
+            },
+            roomId: null,
+            successMessage: '',
+            errorMessage: '',
+            timer: 3,
+            interval: null
+        };
+    },
+    mounted() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userType = localStorage.getItem('userType');
+
+        this.userRole = userType || '';
+
+        if (!user) {
+            this.$router.push('/');
+        }
+    },
+    methods: {
+        async submitRoom() {
+            this.successMessage = '';
+            this.errorMessage = '';
+
+            const user = JSON.parse(localStorage.getItem('user'));
+            const userId = user.userId;
+
+            try {
+                const response = await fetch('http://localhost:8080/api/educators');
+                const educators = await response.json();
+
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar educadores');
+                }
+
+                const educator = educators.find(educator => educator.user.userId === userId);
+                if (!educator) {
+                    throw new Error('Educador não encontrado');
+                }
+
+                const educatorId = educator.educatorId;
+
+                const requestBody = {
+                    educatorId: educatorId,
+                    name: this.form.name,
+                    startDate: this.form.startDate,
+                    endDate: this.form.endDate,
+                    courseName: this.form.courseName,
+                    courseDescription: this.form.courseDescription || '',
+                    coursePrice: this.form.coursePrice,
+                    coursePeriod: this.form.coursePeriod,
+                    courseSchedule: this.form.courseSchedule
+                };
+
+                const createRoomResponse = await fetch('http://localhost:8080/api/rooms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!createRoomResponse.ok) {
+                    throw new Error('Erro ao cadastrar a sala');
+                }
+
+                this.successMessage = 'Sala cadastrada com sucesso!';
+                this.startTimer();
+                window.location.reload();
+            } catch (error) {
+                this.errorMessage = error.message;
+            }
+        },
+
+        startTimer() {
+            this.interval = setInterval(() => {
+                if (this.timer > 0) {
+                    this.timer -= 1;
+                } else {
+                    clearInterval(this.interval);
+                    this.$emit('close-room-register');
+                }
+            }, 1000);
+        }
+    }
+
+}
+</script>
+
+<style scoped></style>

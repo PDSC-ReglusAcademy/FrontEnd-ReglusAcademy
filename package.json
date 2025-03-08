@@ -8,11 +8,17 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@schedule-x/calendar": "^2.16.0",
+    "@schedule-x/drag-and-drop": "^2.16.0",
+    "@schedule-x/theme-default": "^2.16.0",
+    "@schedule-x/vue": "^2.14.0",
     "@syncfusion/ej2-vue-schedule": "^26.1.41",
+    "@toast-ui/calendar": "2.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "core-js": "^3.8.3",
     "font-awesome": "^4.7.0",
+    "tui-calendar": "1.8",
     "vue": "^3.2.13",
     "vue-class-component": "^8.0.0-rc.1",
     "vue-router": "^4.3.0"

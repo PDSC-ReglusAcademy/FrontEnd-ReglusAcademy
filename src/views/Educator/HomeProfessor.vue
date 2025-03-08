@@ -1,5 +1,5 @@
 <template>
-  <NavReglus />
+  <NavReglusV3 />
   <div class="container">
     <h1>Olá, {{ userName }}!</h1>
     <div class="boxes">
@@ -16,7 +16,7 @@
         <div class="content">
           <h2>Acompanhe seus estudantes</h2>
           <p class="small-text">Gratuito</p>
-          <router-link to="/listaralunos" class="button">Acompanhe</router-link>
+          <router-link to="/salas" class="button">Acompanhe</router-link>
         </div>
         <img src="@/assets/content/organizeosestudos.png" alt="Organização" class="image" />
       </div>
@@ -25,11 +25,11 @@
 </template>
 
 <script>
-import NavReglus from "@/components/nav/NavReglusV2.vue";
+import NavReglusV3 from "@/components/nav/NavReglusV3.vue";
 export default {
   name: "HomeProfessor",
   components: {
-    NavReglus,
+    NavReglusV3,
   },
   data() {
     return {

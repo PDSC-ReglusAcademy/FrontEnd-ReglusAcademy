@@ -5,7 +5,7 @@
     <div class="boxes">
       <div class="box blue">
         <div class="content">
-          <h2>Seja acompanhado por um tutor</h2>
+          <h2>Precisa de acompanhamento?</h2>
           <p class="small-text">Gratuito</p>
           <router-link to="/agenda" class="button">Agende</router-link>
         </div>
@@ -14,9 +14,9 @@
 
       <div class="box purple">
         <div class="content">
-          <h2>Organize seus estudos</h2>
+          <h2>Deseja organizar seus estudos?</h2>
           <p class="small-text">Gratuito</p>
-          <router-link to="/introducaoaprogramacao" class="button">Organize</router-link>
+          <router-link to="/versalas" class="button">Organize</router-link>
         </div>
         <img src="@/assets/content/organizeosestudos.png" alt="Organização" class="image" />
       </div>

@@ -8,10 +8,10 @@
                         <router-link to="/">Início</router-link>
                     </li>
                     <li>
-                        <router-link to="/inicioestudante">Recursos</router-link>
+                        <router-link to="/inicioeducador">Recursos</router-link>
                     </li>
                     <li>
-                        <router-link to="/versalas">Salas</router-link>
+                        <router-link to="/salas">Salas</router-link>
                     </li>
                     <li>
                         <router-link to="/agenda">Tutorias</router-link>
@@ -31,7 +31,7 @@
 
 <script>
 export default {
-    name: "NavReglusV2",
+    name: "NavReglusV3",
     data() {
         return {
             logo: require("@/assets/logoreglus.png"),
