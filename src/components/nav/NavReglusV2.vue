@@ -16,9 +16,6 @@
                     <li>
                         <router-link to="/agenda">Tutorias</router-link>
                     </li>
-                    <li>
-                        <router-link to="/sobrenos">Sobre Nós</router-link>
-                    </li>
                 </ul>
             </div>
 
