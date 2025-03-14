@@ -2,7 +2,7 @@
     <NavReglusV3 />
     <div v-if="!loading && activity" id="activity">
         <h2>Detalhes da Atividade</h2>
-        <p><strong>Título:</strong> {{ activity.title }}</p>
+        <p><strong>Descrição da Atividade:</strong> {{ activity.title }}</p>
         <p><strong>Pontuação Máxima:</strong> {{ activity.maxPoints }}</p>
         <p><strong>Prazo:</strong> {{ formattedDataLimit }}</p>
         <p><strong>Data de Criação:</strong> {{ formattedCreatedAt }}</p>

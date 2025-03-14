@@ -138,7 +138,7 @@ export default {
           this.responseColor = 'red';
         }
       } catch (error) {
-        console.error('Error:', error);
+        alert('Error:', error);
         this.responseMessage = 'Erro ao cadastrar estudante.';
         this.responseColor = 'red';
       }

@@ -91,4 +91,25 @@ export default {
 .list {
     margin: 2em;
 }
+
+/* Estilo do botão 'Conferir' */
+.list button {
+    padding: 10px 20px;  /* Espaçamento interno do botão */
+    margin-top: 10px;  /* Margem superior para espaçar do conteúdo acima */
+    font-size: 1rem;  /* Tamanho da fonte */
+    border-radius: 5px;  /* Bordas arredondadas */
+    border: 1px solid #ccc;  /* Borda suave */
+    background-color: black;  /* Cor de fundo preta para o botão */
+    color: white;  /* Cor do texto do botão */
+    cursor: pointer;  /* Aparece como ponteiro ao passar o mouse */
+    transition: background-color 0.3s ease;  /* Animação suave ao passar o mouse */
+    width: 100%;  /* O botão ocupará toda a largura disponível */
+    text-align: center;  /* Garante que o texto do botão esteja centralizado */
+}
+
+/* Estilo do botão ao passar o mouse (hover) */
+.list button:hover {
+    background-color: #8c52ff;  /* Cor mais escura quando o mouse está sobre o botão */
+}
+
 </style>

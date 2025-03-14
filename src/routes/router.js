@@ -7,6 +7,7 @@ const routes = [
   { path: '/cadastroprofessor', component: () => import('@/views/Educator/TelaCadastroProfessor.vue')},
   { path: '/redirecionarlogin', component: () => import('@/views/TelaRedirecionamento.vue')},
   { path: '/agenda', component: () => import('@/views/Resources/ReglusAgenda.vue')},
+  { path: '/agendaeducador', component: () => import('@/views/Educator/AgendaEducador.vue')},
   { path: '/introducaoaprogramacao', component: () => import('@/views/Resources/ReglusRoomSobre.vue')},
   { path: '/educacaoinclusiva', component: () => import('@/views/Resources/ReglusRoomInclusiva.vue')},
   { path: '/sobrenos', component: () => import('@/views/TelaSobreNos.vue')},

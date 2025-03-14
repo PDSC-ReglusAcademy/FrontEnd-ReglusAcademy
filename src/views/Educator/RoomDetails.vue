@@ -13,72 +13,96 @@
         <div v-if="!loading && room" id="room">
         <!-- Caixa de 'descRoom' -->
         <div class="descRoom">
-        <div class="header" @click="toggleBox('descRoom')">
-            <h3>{{ room.name }}</h3>
-            <i class="arrow" :class="{'rotated': isBoxMinimized['descRoom']}"></i>
-        </div>
-        <div class="content" v-show="!isBoxMinimized['descRoom']">
-            <p><strong>Curso:</strong> {{ room.course.name }}</p>
-            <p><strong>Descrição:</strong> {{ room.course.description }}</p>
-            <p><strong>Preço:</strong> R$ {{ room.course.price }}</p>
-            <p><strong>Início:</strong> {{ room.startDate }}</p>
-            <p><strong>Término:</strong> {{ room.endDate || 'Em andamento' }}</p>
-            <p><strong>Período:</strong> {{ room.course.period }}</p>
-            <p><strong>Frequência:</strong> {{ room.course.schedule }}</p>
-        </div>
+            <div class="header" @click="toggleBox('descRoom')">
+                <h3>{{ room.name }}</h3>
+                <i class="arrow" :class="{'rotated': isBoxMinimized['descRoom']}"></i>
+            </div>
+            <div class="content" v-show="!isBoxMinimized['descRoom']">
+                <p><strong>Curso:</strong> {{ room.course.name }}</p>
+                <p><strong>Descrição:</strong> {{ room.course.description }}</p>
+                <p><strong>Preço:</strong> R$ {{ room.course.price }}</p>
+                <p><strong>Início:</strong> {{ room.startDate }}</p>
+                <p><strong>Término:</strong> {{ room.endDate || 'Em andamento' }}</p>
+                <p><strong>Período:</strong> {{ room.course.period }}</p>
+                <p><strong>Frequência:</strong> {{ room.course.schedule }}</p>
+            </div>
         </div>
 
         <!-- Caixa de 'descEducator' -->
         <div class="descEducator">
-        <div class="header" @click="toggleBox('descEducator')">
-            <h4>Informações do Educador</h4>
-            <i class="arrow" :class="{'rotated': isBoxMinimized['descEducator']}"></i>
-        </div>
-        <div class="content" v-show="!isBoxMinimized['descEducator']">
-            <p><strong>Nome:</strong> {{ room.educator.user.name }}</p>
-            <p><strong>Email:</strong> {{ room.educator.user.email }}</p>
-            <p><strong>Experiência:</strong> {{ room.educator.experienceYears }} anos</p>
-            <p><strong>Bio:</strong> {{ room.educator.bio || 'Não disponível' }}</p>
-        </div>
+            <div class="header" @click="toggleBox('descEducator')">
+                <h4>Informações do Educador</h4>
+                <i class="arrow" :class="{'rotated': isBoxMinimized['descEducator']}"></i>
+            </div>
+            <div class="content" v-show="!isBoxMinimized['descEducator']">
+                <p><strong>Nome:</strong> {{ room.educator.user.name }}</p>
+                <p><strong>Email:</strong> {{ room.educator.user.email }}</p>
+                <p><strong>Experiência:</strong> {{ room.educator.experienceYears }} anos</p>
+                <p><strong>Bio:</strong> {{ room.educator.bio || 'Não disponível' }}</p>
+            </div>
         </div>
 
         <!-- Caixa de 'descStudents' -->
         <div class="descStudents">
-        <div class="header" @click="toggleBox('descStudents')">
-            <h4>Alunos Cadastrados</h4>
-            <i class="arrow" :class="{'rotated': isBoxMinimized['descStudents']}"></i>
-        </div>
-        <div class="content" v-show="!isBoxMinimized['descStudents']">
-            <ul v-if="students.length > 0">
-            <li v-for="student in students" :key="student.studentId">
-                <strong>{{ student.user.name }}</strong><br />
-                <span>{{ student.user.email }}</span><br />
-                <span>Estado: {{ student.state }}</span><br />
-                <span>Cidade: {{ student.city }}</span><br />
-                <router-link :to="{ name: 'estudante', params: { studentId: student.studentId } }">
-                <button>Conferir Ficha de Acompanhamento</button>
-                </router-link>
-            </li>
-            </ul>
-            <div v-else>
-            Nenhum aluno cadastrado na sala.
+            <div class="header" @click="toggleBox('descStudents')">
+                <h4>Alunos Cadastrados</h4>
+                <i class="arrow" :class="{'rotated': isBoxMinimized['descStudents']}"></i>
+            </div>
+            <div class="content" v-show="!isBoxMinimized['descStudents']">
+                <ul v-if="students.length > 0">
+                    <li v-for="student in students" :key="student.studentId">
+                        <strong>{{ student.user.name }}</strong><br />
+                        <span>{{ student.user.email }}</span><br />
+                        <span>Estado: {{ student.state }}</span><br />
+                        <span>Cidade: {{ student.city }}</span><br />
+                        <router-link :to="{ name: 'estudante', params: { studentId: student.studentId } }">
+                        <button>Conferir Ficha de Acompanhamento</button>
+                        </router-link>
+                    </li>
+                </ul>
+                <div v-else>
+                    Nenhum aluno cadastrado na sala.
+                </div>
             </div>
         </div>
-                <!-- Formulário de nova atividade -->
+
+        <!-- Caixa de 'descActivities' com 'Criar Atividade' dentro -->
+        <div class="descActivities">
+            <div class="header" @click="toggleBox('descActivities')">
+                <h4>Atividades</h4>
+                <i class="arrow" :class="{'rotated': isBoxMinimized['descActivities']}"></i>
+            </div>
+            <div class="content" v-show="!isBoxMinimized['descActivities']">
+                <div v-if="activities.length > 0">
+                    <ul>
+                        <li v-for="activity in activities" :key="activity.activityId">
+                            <strong>{{ activity.title }}</strong><br />
+                            <span>Máxima pontuação: {{ activity.maxPoints }}</span><br />
+                            <span>Prazo: {{ activity.dueDate }}</span><br />
+                            <router-link :to="{ name: 'atividade', params: { activityId: activity.activityId } }">
+                                <button>Conferir</button>
+                            </router-link>
+                        </li>
+                    </ul>
+                </div>
+                <div v-else>
+                    Nenhuma atividade cadastrada para esta sala.
+                </div>
+                <!-- Formulário de nova atividade dentro de 'Atividades' -->
                 <div class="newActivityForm">
                     <form class="createActivityForm" @submit.prevent="createActivity">
-                        <input v-model="newActivity.title" placeholder="Título da atividade" required />
+                        <input v-model="newActivity.title" placeholder="Descrição da atividade" required />
                         <input v-model="newActivity.maxPoints" type="number" placeholder="Máxima pontuação" required />
-                        <input v-model="dataLimitString" type="datetime-local" required />
+                        <input v-model="newActivity.dueDate" type="datetime-local" required />
                         <button type="submit">Criar Atividade</button>
                     </form>
                 </div>
             </div>
         </div>
+        </div>
 
         <FooterReglus />
     </div>
-
 </template>
 
 <script>
@@ -106,7 +130,7 @@ export default {
             newActivity: {
                 title: '',
                 maxPoints: '',
-                dataLimit: ''
+                dueDate: ''
             },
             loading: true,
             errorMessage: '',
@@ -148,8 +172,7 @@ export default {
                     throw new Error("Erro ao carregar os alunos.");
                 }
                 this.students = await studentsResponse.json();
-
-                const activitiesResponse = await fetch(`http://localhost:8080/api/activities/room/${roomId}/activities`);
+                const activitiesResponse = await fetch(`http://localhost:8080/api/activities/room/${roomId}`);
                 if (!activitiesResponse.ok) {
                     throw new Error("Erro ao carregar as atividades.");
                 }
@@ -164,6 +187,7 @@ export default {
 
         async createActivity() {
             const user = JSON.parse(localStorage.getItem('user'));
+            console.log(user)
             const educatorEmail = user ? user.email : null;
 
             if (!educatorEmail) {
@@ -172,19 +196,20 @@ export default {
 
             const educatorResponse = await fetch(`http://localhost:8080/api/users/email/${encodeURIComponent(educatorEmail)}`);
             const educatorData = await educatorResponse.json();
-            const educatorId = educatorData.userId;
+            const userId = educatorData.userId;
+            console.log(userId)
 
             const roomId = parseInt(this.$route.params.roomId, 10);
 
-            const dataLimitString = "2025-02-27T15:48";
-            const dataLimit = new Date(dataLimitString).toISOString();
+            //const dataLimitString = "2025-02-27T15:48";
+           // const dataLimit = new Date(dataLimitString).toISOString();
 
             const activityData = {
                 roomId,
-                educatorId,
+                userId,
                 title: this.newActivity.title,
                 maxPoints: this.newActivity.maxPoints,
-                dataLimit: dataLimit
+                dueDate: this.newActivity.dueDate
             };
 
             console.log(activityData)
@@ -215,53 +240,33 @@ export default {
     display: flex;
     flex-direction: column; /* Organiza as caixas em uma coluna */
     justify-content: space-between; /* Distribui as caixas com espaçamento entre elas */
-    /*height: 90vh; /* Garantir que o contêiner ocupe toda a altura da tela */
     padding: 100px; /* Espaçamento entre as margens da tela e as caixas */
     box-sizing: border-box; /* Inclui o padding e as bordas no cálculo do tamanho */
 }
 
 .descRoom, .descEducator, .descStudents, .descActivities {
-    /*height: 18%; /* As caixas ocupam 18% da altura total (ajuste conforme necessário) */
     margin-bottom: 20px; /* Espaçamento entre as caixas */
     background-color: white; /* Fundo branco dentro das caixas */
     border-radius: 10px; /* Bordas arredondadas */
-    border: 2px solid #8c52ff; /* Bordas roxas */
+    border: 2px solid #8b59ef; /* Bordas roxas */
     padding: 20px; /* Espaçamento interno das caixas */
     box-sizing: border-box; /* Inclui o padding e a borda no cálculo do tamanho */
-    /*overflow-y: auto; /* Caso o conteúdo seja maior que o tamanho da caixa, permitir rolagem */
-
-    /* Efeito de luz nas bordas */
-    box-shadow: 0 0 15px #8c52ff; /* Luz roxa suave */
+    box-shadow: 0 0 15px #915ff7; /* Luz roxa suave */
     transition: box-shadow 0.3s ease-in-out; /* Animação suave ao passar o mouse */
 }
 
-/* Garantir que, em telas menores, as caixas se ajustem para 100% da largura */
-@media (max-width: 768px) {
-    .descRoom, .descEducator, .descStudents, .descActivities {
-        width: 100%;
-    }
-}
-
 .newActivityForm {
-    margin-bottom: 20px;
+    margin-top: 20px; /* Espaço entre a lista de atividades e o formulário */
     background-color: white;
     border-radius: 10px;
     border: 2px solid black;
     padding: 20px;
     box-sizing: border-box;
-    width: 60%;
-    height: auto;      /* Ajusta a altura conforme o conteúdo */
-    margin-left: 250px;
-    
-    /* Centralização com flexbox */
-    display: flex;
-    justify-content: center;  /* Centraliza o formulário horizontalmente */
-    align-items: center;      /* Centraliza o formulário verticalmente */
-    flex-direction: column;   /* Organiza os elementos na direção vertical */
+    width: 100%; /* Garantir que ocupe 100% da largura */
 }
 
 .createActivityForm {
-    width: 100%;  /* Faz o formulário ocupar 100% da largura da 'newActivityForm' */
+    width: 100%;  /* Faz o formulário ocupar 100% da largura */
     padding: 15px;
     gap: 10px; /* Espaçamento entre os campos */
 }
@@ -276,7 +281,7 @@ export default {
 }
 
 .createActivityForm button {
-    background-color: black;  /* Cor de fundo roxa para o botão */
+    background-color: black;  /* Cor de fundo preta para o botão */
     color: white;  /* Cor do texto do botão */
     cursor: pointer;  /* Aparece como um ponteiro quando o usuário passar o mouse */
     border: none;
@@ -284,7 +289,7 @@ export default {
 }
 
 .createActivityForm button:hover {
-    background-color: black;  /* Cor mais escura ao passar o mouse */
+    background-color: #8c52ff;  /* Cor mais escura ao passar o mouse */
 }
 
 .header {
@@ -307,16 +312,36 @@ export default {
 
 /* Estilo da seta */
 .arrow:before {
-    content: '\005E';  /* Você pode usar um ícone ou caracter de seta aqui */
+    content: '\005E'; 
 }
 
 /* Estilo da seta ao ser rotacionada */
 .arrow.rotated:before {
-    content: '\005E';  /* Seta apontando para cima ao ser rotacionada */
+    content: '\005E'; 
 }
 
 .content {
     margin-top: 10px;
     display: block;
 }
+
+.createActivityForm button,
+.descActivities button {
+    width: auto;  /* Largura automática para se ajustar ao texto */
+    padding: 10px 20px;  /* Adiciona um bom espaçamento interno */
+    margin: 5px 0;  /* Espaçamento entre os botões */
+    font-size: 1rem;  /* Tamanho da fonte */
+    border-radius: 5px;  /* Bordas arredondadas */
+    border: 1px solid #ccc;  /* Borda suave */
+    background-color: black;  /* Cor de fundo preta para o botão */
+    color: white;  /* Cor do texto do botão */
+    cursor: pointer;  /* Aparece como um ponteiro quando o usuário passar o mouse */
+    transition: background-color 0.3s ease;  /* Animação suave ao passar o mouse */
+    text-align: center;  /* Garante que o texto do botão esteja centralizado */
+}
+
+.descActivities button:hover {
+    background-color: #8c52ff;  /* Cor mais escura ao passar o mouse */
+}
+
 </style>

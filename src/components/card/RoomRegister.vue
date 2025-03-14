@@ -66,7 +66,6 @@
 </template>
 
 <script>
-
 export default {
     name: "RoomRegister",
     data() {
@@ -74,7 +73,6 @@ export default {
             userRole: '',
             form: {
                 name: '',
-                description: '',
                 startDate: '',
                 endDate: '',
                 courseName: '',
@@ -83,7 +81,6 @@ export default {
                 coursePeriod: '',
                 courseSchedule: ''
             },
-            roomId: null,
             successMessage: '',
             errorMessage: '',
             timer: 3,
@@ -102,72 +99,130 @@ export default {
     },
     methods: {
         async submitRoom() {
-            this.successMessage = '';
-            this.errorMessage = '';
+    this.successMessage = '';
+    this.errorMessage = '';
 
-            const user = JSON.parse(localStorage.getItem('user'));
-            const userId = user.userId;
+    const user = JSON.parse(localStorage.getItem('user'));
+    const userId = user.userId;
 
-            try {
-                const response = await fetch('http://localhost:8080/api/educators');
-                const educators = await response.json();
+    try {
+        // Buscar o educador
+        const response = await fetch('http://localhost:8080/api/educators');
+        const educators = await response.json();
 
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar educadores');
-                }
-
-                const educator = educators.find(educator => educator.user.userId === userId);
-                if (!educator) {
-                    throw new Error('Educador não encontrado');
-                }
-
-                const educatorId = educator.educatorId;
-
-                const requestBody = {
-                    educatorId: educatorId,
-                    name: this.form.name,
-                    startDate: this.form.startDate,
-                    endDate: this.form.endDate,
-                    courseName: this.form.courseName,
-                    courseDescription: this.form.courseDescription || '',
-                    coursePrice: this.form.coursePrice,
-                    coursePeriod: this.form.coursePeriod,
-                    courseSchedule: this.form.courseSchedule
-                };
-
-                const createRoomResponse = await fetch('http://localhost:8080/api/rooms', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!createRoomResponse.ok) {
-                    throw new Error('Erro ao cadastrar a sala');
-                }
-
-                this.successMessage = 'Sala cadastrada com sucesso!';
-                this.startTimer();
-                window.location.reload();
-            } catch (error) {
-                this.errorMessage = error.message;
-            }
-        },
-
-        startTimer() {
-            this.interval = setInterval(() => {
-                if (this.timer > 0) {
-                    this.timer -= 1;
-                } else {
-                    clearInterval(this.interval);
-                    this.$emit('close-room-register');
-                }
-            }, 1000);
+        if (!response.ok) {
+            throw new Error('Erro ao buscar educadores');
         }
-    }
 
+        const educator = educators.find(educator => educator.user.userId === userId);
+        if (!educator) {
+            throw new Error('Educador não encontrado');
+        }
+
+        const educatorId = educator.educatorId;
+
+        // Definir um valor padrão para endDate se não for preenchido
+        const startDate = this.form.startDate ? `${this.form.startDate}T00:00:00` : null;
+        const endDate = this.form.endDate ? `${this.form.endDate}T00:00:00` : startDate;
+        // Usa startDate como valor padrão
+
+        // Criar o objeto Course
+        const course = {
+            name: this.form.courseName,
+            description: this.form.courseDescription,
+            price: this.form.coursePrice,
+            period: this.form.coursePeriod,
+            schedule: this.form.courseSchedule
+        };
+
+        // Criar o objeto Room com o Course e Educator associados
+        const requestBody = {
+            educator: { educatorId: educatorId },
+            name: this.form.name,
+            startDate: startDate,
+            endDate: endDate, // Usa o valor padrão se não for preenchido
+            course: course
+        };
+
+        // Enviar a requisição para criar a sala
+        const createRoomResponse = await fetch('http://localhost:8080/api/rooms', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!createRoomResponse.ok) {
+            throw new Error('Erro ao cadastrar a sala');
+        }
+
+        this.successMessage = 'Sala cadastrada com sucesso!';
+        this.startTimer();
+        window.location.reload();
+    } catch (error) {
+        this.errorMessage = error.message;
+    }
+},
+
+    startTimer() {
+        this.interval = setInterval(() => {
+            if (this.timer > 0) {
+                this.timer -= 1;
+            } else {
+                clearInterval(this.interval);
+                this.$emit('close-room-register');
+            }
+        }, 1000);
+    }
+}
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.btn {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.alert {
+    margin-top: 20px;
+}
+
+/* Estilo do botão 'Cadastrar Sala Nova' */
+.btn button {
+    padding: 10px 20px;  /* Espaçamento interno do botão */
+    margin: 5px 0;  /* Espaçamento entre os botões */
+    font-size: 1rem;  /* Tamanho da fonte */
+    border-radius: 5px;  /* Bordas arredondadas */
+    border: 1px solid #ccc;  /* Borda suave */
+    background-color: black;  /* Cor de fundo preta para o botão */
+    color: white;  /* Cor do texto do botão */
+    cursor: pointer;  /* Aparece como ponteiro ao passar o mouse */
+    transition: background-color 0.3s ease;  /* Animação suave ao passar o mouse */
+    text-align: center;  /* Garante que o texto do botão esteja centralizado */
+    width: 100%;  /* O botão ocupará toda a largura disponível */
+}
+
+/* Estilo do botão ao passar o mouse (hover) */
+.btn button:hover {
+    background-color: #8c52ff;  /* Cor mais escura quando o mouse está sobre o botão */
+}
+</style>

@@ -7,7 +7,7 @@
         <div class="content">
           <h2>Agende reuniões</h2>
           <p class="small-text">Gratuito</p>
-          <router-link to="/agenda" class="button">Agende</router-link>
+          <router-link to="/agendaeducador" class="button">Agende</router-link>
         </div>
         <img src="@/assets/content/professorealuno.png" alt="Tutor" class="image" />
       </div>

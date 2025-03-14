@@ -14,7 +14,7 @@
                         <router-link to="/salas">Salas</router-link>
                     </li>
                     <li>
-                        <router-link to="/agenda">Tutorias</router-link>
+                        <router-link to="/agendaeducador">Tutorias</router-link>
                     </li>
                 </ul>
             </div>

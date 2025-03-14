@@ -71,7 +71,7 @@ button {
     min-width: 5px;
     padding: 0.3em 1em;
     background-color: var(--lilas);
-    color: white;
+    color: black;
     border-radius: 7px;
     transition: background-color 0.7s;
 }

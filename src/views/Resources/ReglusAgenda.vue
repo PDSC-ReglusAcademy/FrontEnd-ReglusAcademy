@@ -1,138 +1,121 @@
 <template>
+  <NavReglusV2></NavReglusV2>
   <div class="calendar-container">
+    <div>
+      <NavReglus />
+    </div>
     <!-- Seleção de Mês -->
     <div class="month-selector">
       <button class="btn" @click="prevMonth">Anterior</button>
-      <span>{{ months[currentMonth] }} {{ currentYear }}</span>
+      <span class="month-year">{{ months[currentMonth] }} {{ currentYear }}</span>
       <button class="btn" @click="nextMonth">Próximo</button>
     </div>
 
-    <div class="view-selector">
-      <button :class="{'active': viewMode === 'day'}" @click="setView('day')">Dia</button>
-      <button :class="{'active': viewMode === 'week'}" @click="setView('week')">Semana</button>
-      <button :class="{'active': viewMode === 'month'}" @click="setView('month')">Mês</button>
-    </div>
+    <div class="main-content">
+      <!-- Exibição do Calendário -->
+      <div class="calendar-wrapper">
+        <table class="calendar">
+          <thead>
+            <tr>
+              <th v-for="day in daysOfWeek" :key="day" class="day-header">{{ day }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="week in weeks" :key="week">
+              <td
+                v-for="day in week"
+                :key="day ? day.date : ''"
+                @click="day ? selectDate(day.date) : null"
+                :class="{'selected': day && isSelected(day.date)}"
+              >
+                {{ day ? day.date.getDate() : '' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    <!-- Modo Semana -->
-    <div v-if="viewMode === 'week'" class="week-view">
-      <div class="week-header">
-        <div class="day-header" v-for="(day, index) in daysOfWeek" :key="index">{{ day }}</div>
-      </div>
-      <div class="week-body">
-        <div v-for="(day, index) in daysOfWeek" :key="index" class="day-column">
-          <div 
-            class="hourly-slot" 
-            v-for="hour in 24" 
-            :key="hour"
-            @click="openEventPopup(day, hour)">
-            <div class="hour-label">{{ hour }}:00</div>
-            <div v-for="event in getEventsForDay(day, hour)" :key="event.id" class="event">{{ event.title }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <div class="divider"></div>
 
-    <!-- Modo Dia -->
-    <div v-if="viewMode === 'day'" class="day-view">
-      <div class="day-header">
-        <span>{{ formatDate(currentDate) }}</span>
-      </div>
-      <div class="day-body">
-        <div 
-          class="hourly-slot" 
-          v-for="hour in 24" 
-          :key="hour"
-          @click="openEventPopup(currentDate, hour)">
-          <div class="hour-label">{{ hour }}:00</div>
-          <div v-for="event in getEventsForDay(currentDate, hour)" :key="event.id" class="event">{{ event.title }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- No modo Mês -->
-    <div class="month-header">
-      <div class="month-day" 
-          v-for="(week, weekIndex) in weeksInMonth" 
-          :key="weekIndex">
-        <div v-for="(day, dayIndex) in week" :key="dayIndex" @click="openEventPopup(day)">
-          <!-- Verificação adicional para garantir que day é um Date -->
-          {{ day instanceof Date ? day.getDate() : '' }}
-          <div v-for="event in getEventsForDay(day)" :key="event.id" class="event">{{ event.title }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Pop-up de evento -->
-    <div v-if="popupVisible" class="popup show">
-      <div class="popup-header">
-        <h3>Criar Evento</h3>
-        <button @click="closePopup">X</button>
-      </div>
-      <div class="popup-body">
-        <input type="text" v-model="newEvent.title" placeholder="Título do evento" class="new-event-title"/>
-        <textarea v-model="newEvent.description" placeholder="Descrição do evento" class="new-event-description"></textarea>
-      </div>
-      <div class="popup-footer">
-        <button @click="saveEvent">Criar Evento</button>
+      <!-- To-Do List para o Dia Selecionado -->
+      <div v-if="selectedDate && showTodoList" class="todo-list">
+        <button class="close-btn" @click="closeTodoList">×</button>
+        <h3>Tarefas para {{ formatDate(selectedDate) }}</h3>
+        <ul>
+          <li v-for="(task, index) in todos[selectedDateString] || []" :key="index">
+            <input type="text" v-model="task.text" />
+            <button class="btn" @click="removeTask(index)">Remover</button>
+          </li>
+        </ul>      
+        <input type="text" v-model="newTask" placeholder="Nova Tarefa" />
+        <button class="btn" @click="addTask">Adicionar Tarefa</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import NavReglusV2 from "@/components/nav/NavReglusV2.vue";
 export default {
+  name: "AgendaReglus",
+  components: {
+    NavReglusV2,
+  },
   data() {
     return {
-      months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+      daysOfWeek: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+      months: [
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      ],
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
-      currentDate: new Date(),
-      daysOfWeek: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-      viewMode: 'week',  // 'day', 'week', 'month'
-      events: [],
-      popupVisible: false,
-      newEvent: {
-        title: '',
-        description: '',
-        day: null,
-        hour: null
-      },
+      selectedDate: null,
+      newTask: '',
+      todos: {},
+      showTodoList: true,  // Controle de visibilidade da lista de tarefas
     };
   },
   computed: {
-    // Computed Property to calculate the weeks in the current month
-    weeksInMonth() {
+    weeks() {
+      const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+      const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+      const days = [];
+
+      // Preenche os dias do mês
+      for (let i = 1; i <= daysInMonth; i++) {
+        days.push({ date: new Date(this.currentYear, this.currentMonth, i) });
+      }
+
+      // Preenche as semanas
       const weeks = [];
-      const firstDayOfMonth = new Date(this.currentYear, this.currentMonth, 1);
-      const lastDayOfMonth = new Date(this.currentYear, this.currentMonth + 1, 0);
-
-      let currentDay = firstDayOfMonth;
-      let currentWeek = [];
-
-      while (currentDay <= lastDayOfMonth) {
-        currentWeek.push(new Date(currentDay));  // Ensure it's a Date object
-        
-        // If we reach the end of the week (Saturday)
-        if (currentDay.getDay() === 6) {
-          weeks.push(currentWeek);
-          currentWeek = [];
+      let week = new Array(firstDay).fill(null);
+      for (let day of days) {
+        if (week.length === 7) {
+          weeks.push(week);
+          week = [];
         }
-
-        // Move to the next day
-        currentDay = new Date(currentDay.setDate(currentDay.getDate() + 1));
+        week.push(day);
       }
-
-      // Push the last incomplete week, if any
-      if (currentWeek.length) {
-        weeks.push(currentWeek);
+      while (week.length < 7) {
+        week.push(null); // Preenche com dias vazios
       }
+      weeks.push(week);
 
       return weeks;
-    }
+    },
+    selectedDateString() {
+      return this.selectedDate ? this.selectedDate.toDateString() : '';
+    },
   },
   methods: {
-    setView(view) {
-      this.viewMode = view;
+    nextMonth() {
+      if (this.currentMonth === 11) {
+        this.currentMonth = 0;
+        this.currentYear++;
+      } else {
+        this.currentMonth++;
+      }
     },
     prevMonth() {
       if (this.currentMonth === 0) {
@@ -141,339 +124,179 @@ export default {
       } else {
         this.currentMonth--;
       }
-      this.updateWeeksInMonth();
     },
-    nextMonth() {
-      if (this.currentMonth === 11) {
-        this.currentMonth = 0;
-        this.currentYear++;
-      } else {
-        this.currentMonth++;
-      }
-      this.updateWeeksInMonth();
-    },
-    updateWeeksInMonth() {
-      const weeks = [];
-      const firstDayOfMonth = new Date(this.currentYear, this.currentMonth, 1);
-      const lastDayOfMonth = new Date(this.currentYear, this.currentMonth + 1, 0);
-
-      let currentDay = firstDayOfMonth;
-      let currentWeek = [];
-
-      while (currentDay <= lastDayOfMonth) {
-        currentWeek.push(new Date(currentDay));  // Ensure it's a Date object
-        
-        if (currentDay.getDay() === 6) {
-          weeks.push(currentWeek);
-          currentWeek = [];
-        }
-
-        currentDay = new Date(currentDay.setDate(currentDay.getDate() + 1));
-      }
-
-      if (currentWeek.length) {
-        weeks.push(currentWeek);
-      }
-
-      this.weeksInMonth = weeks;
-    },
-
-    // Método para abrir o popup de evento
-    openEventPopup(day, hour = null) {
-      // Garantir que 'day' seja sempre um objeto Date
-      if (!(day instanceof Date)) {
-        day = new Date(day);  // Converte day para um objeto Date se necessário
-      }
-
-      this.newEvent.day = day;
-      this.newEvent.hour = hour;
-      this.popupVisible = true;
-    },
-
-    // Método para fechar o popup de evento
-    closePopup() {
-      this.popupVisible = false;
-      this.newEvent.title = '';
-      this.newEvent.description = '';
-    },
-
-    // Método para salvar o evento
-    saveEvent() {
-      if (this.newEvent.title.trim()) {
-        const newEvent = {
-          id: Date.now(),
-          title: this.newEvent.title,
-          description: this.newEvent.description,
-          day: this.newEvent.day,
-          hour: this.newEvent.hour
-        };
-        this.events.push(newEvent);
-        this.closePopup();
+    selectDate(date) {
+      // Quando uma nova data é selecionada, reabre a lista de tarefas
+      this.selectedDate = date;
+      this.showTodoList = true; // Garante que a lista será aberta novamente
+      // Inicializa a lista de tarefas para a data selecionada, se ainda não existir
+      if (!this.todos[this.selectedDateString]) {
+        this.todos[this.selectedDateString] = [];
       }
     },
-
-    // Método para obter os eventos do dia (opcionalmente filtrado por hora)
-    getEventsForDay(day, hour = null) {
-      // Garantir que 'day' seja sempre um objeto Date
-      if (!(day instanceof Date)) {
-        day = new Date(day);  // Converte day para um objeto Date se necessário
-      }
-
-      return this.events.filter(event => {
-        return event.day.toLocaleDateString() === day.toLocaleDateString() && (hour ? event.hour === hour : true);
-      });
+    isSelected(date) {
+      return this.selectedDate && this.selectedDate.toDateString() === date.toDateString();
     },
-
-    // Método para formatar a data (para exibir em formato legível)
     formatDate(date) {
-      return date.toLocaleDateString('pt-BR');
-    }
-  }
+      return date.toLocaleDateString();
+    },
+    addTask() {
+      if (this.newTask.trim()) {
+        this.todos[this.selectedDateString].push({ text: this.newTask });
+        this.newTask = '';
+      }
+    },
+    removeTask(index) {
+      this.todos[this.selectedDateString].splice(index, 1);
+    },
+    closeTodoList() {
+      this.showTodoList = false; // Fecha a lista de tarefas
+    },
+  },
 };
 </script>
 
 <style scoped>
-/* Estilos básicos */
-body {
-  font-family: 'Roboto', sans-serif; /* Fonte similar à do Google */
-  background-color: #f0f0f0; /* Cor de fundo mais suave */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
+/* Estilo geral do contêiner da agenda */
 .calendar-container {
-  width: 90%;
-  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Seleção de Mês e Visualização */
-.month-selector, .view-selector {
+/* Estilo da barra de navegação do mês */
+.month-selector {
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  max-width: 500px;  /* Aumentar a largura da barra de navegação */
   margin-bottom: 20px;
-  align-items: center;
+  padding: 20px;
+}
+
+/* Botões de navegação "Anterior" e "Próximo" */
+.btn {
+  background-color: #8c52ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .btn {
-  background-color: #4285f4; /* Azul do Google */
-  color: #ffffff;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  margin: 0 15px; /* Adiciona mais espaço entre os botões */
 }
 
-.btn:hover {
-  background-color: #357ae8; /* Azul mais escuro ao passar o mouse */
+/* Nome do mês e ano */
+.month-year {
+  font-size: 24px; /* Aumenta o tamanho da fonte */
+  font-weight: bold; /* Coloca o nome do mês e ano em negrito */
+  color: #333; /* Cor do texto */
+  text-align: center; /* Centraliza o texto */
 }
 
-.view-selector button {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.view-selector button.active {
-  background-color: #34a853; /* Verde do Google */
-  color: #ffffff;
-}
-
-.view-selector button:hover {
-  background-color: #f1f1f1; /* Cor de fundo ao passar o mouse */
-}
-
-/* Semana - Grade com horários */
-.week-view {
+/* Estilo do conteúdo principal, contendo o calendário e a lista de tarefas */
+.main-content {
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  height: 80vh;
 }
 
-.week-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.day-header {
-  flex: 1;
-  text-align: center;
-  padding: 10px;
-  background-color: #4285f4; /* Azul do Google */
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.week-body {
-  display: flex;
-}
-
-.day-column {
-  flex: 1;
-  border-left: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-}
-
-.hourly-slot {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.hour-label {
-  padding: 10px;
-  background-color: #f9f9f9; /* Cor de fundo mais clara */
-  text-align: center;
-}
-
-.event {
-  padding: 5px;
-  margin: 5px;
-  background-color: #34a853; /* Verde do Google */
-  color: #ffffff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* Pop-up de evento */
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #ffffff;
+/* Estilo do calendário */
+.calendar-wrapper, .todo-list {
+  flex: 1; /* Ocupa metade da largura */
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  display: none;
+  box-sizing: border-box;
 }
 
-.popup.show {
-  display: block;
+/* Divisória entre o calendário e a lista de tarefas */
+.divider {
+  width: 2px;
+  background-color: #8c52ff;
+  height: 100%;
 }
 
-.popup .popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+/* Estilo da tabela do calendário */
+.calendar {
+  border-collapse: collapse;
+  width: 100%;
+  height: 100%;
 }
 
-.popup .popup-header h3 {
-  margin: 0;
-  font-size: 1.2em;
-}
-
-.popup .popup-header button {
-  background-color: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.popup .popup-header button:hover {
-  color: #dc3545; /* Vermelho para fechar */
-}
-
-.popup .popup-body {
-  padding: 10px 0;
-}
-
-.popup .popup-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 15px;
-}
-
-.popup .popup-footer button {
-  padding: 10px 15px;
-  background-color: #34a853; /* Verde do Google */
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.popup .popup-footer button:hover {
-  background-color: #28a745; /* Verde mais escuro ao passar o mouse */
-}
-
-/* Modo Mês */
-.month-view {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
-}
-
-.month-day {
+.calendar th, .calendar td {
+  border: 1px solid #ccc;
   padding: 10px;
-  background-color: #f9f9f9; /* Cor de fundo mais clara */
+  width: 40px;
   text-align: center;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s;
 }
 
-.month-day:hover {
-  background-color: #4285f4; /* Azul do Google ao passar o mouse */
-  color: #ffffff;
+.selected {
+  background-color: #f0f0f0;
 }
 
-.month-day .event {
-  background-color: #34a853; /* Verde do Google */
-  color: #ffffff;
+/* Estilo para as células do calendário */
+.calendar td:hover {
+  background-color: #8c52ff; 
+}
+
+.calendar .selected {
+  background-color: #8c52ff;
+}
+
+/* Estilo dos cabeçalhos dos dias da semana */
+.day-header {
+  background-color: #8c52ff; /* Cor roxa clara */
+  color: white; /* Texto branco */
+  padding: 10px; /* Espaçamento interno */
+  text-align: center; /* Alinha o texto ao centro */
+  border: 1px solid #ddd; /* Borda leve ao redor das células */
+}
+
+/* Estilo da lista de tarefas */
+.todo-list {
+  position: relative; /* Torna a div 'todo-list' com contexto de posicionamento */
+  max-width: 100%;
+  padding: 20px;
+}
+
+.todo-list input {
+  width: 100%;
   padding: 5px;
-  border-radius: 4px;
-  margin-top: 5px;
+  margin-bottom: 10px;
 }
 
-.month-header {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
+/* Estilo para os itens da lista */
+.todo-list ul {
+  list-style-type: none; /* Remove os marcadores da lista */
+  padding: 0; /* Remove o padding padrão */
 }
 
-.month-header .day-header {
-  font-weight: bold;
+.todo-list li {
+  display: flex; /* Usa flexbox para alinhas itens */
+  align-items: center; /* Alinha itens verticalmente no centro */
+  margin-bottom: 10px; /* Espaço entre os itens */
 }
 
-/* Modo Dia */
-.day-view .day-header {
-  text-align: center;
-  font-size: 1.5em;
-  margin-bottom: 20px;
+.todo-list input[type="text"] {
+  flex: 1; /* Faz com que o campo de texto ocupe o máximo de espaço disponível */
+  padding: 5px; /* Espaçamento interno */
+  margin-right: 10px; /* Espaço entre o campo de texto e o botão */
 }
 
-.day-view .hourly-slot {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid #ddd;
+/* Estilo do botão de fechar da lista de tarefas */
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #8c52ff;
   cursor: pointer;
-}
-
-.day-view .hour-label {
-  padding: 10px;
-  background-color: #f9f9f9; /* Cor de fundo mais clara */
-  text-align: center;
-}
-
-.day-view .event {
-  padding: 5px;
-  margin: 5px;
-  background-color: #34a853; /* Verde do Google */
-  color: #ffffff;
-  border-radius: 4px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10; /* Garante que o botão fique sobre os outros elementos */
 }
 </style>
